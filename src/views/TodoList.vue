@@ -1,89 +1,44 @@
 <template>
-  <section>
-    <div class="col-md-6">
-      <div class="card" v-for="todo in todos" :key="todo._id">
-        <div class="card-body">
-          <div class="d-flex align-items-center justify-content-between">
-            <div>{{ todo.title }}</div>
-            <div>
-              <router-link
-                :to="{
-                  name: 'TodoItem',
-                  params: { title: todo.title, description: todo.description },
-                }"
-                tag="button"
-                class="btn btn-link"
-                >></router-link
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <b-button id="show-btn" @click="$bvModal.show('modal-1')">+</b-button>
-    <Modal id="modal-1" />
-    <!-- <b-modal id="modal-1" hide-footer hide-header>
-      <div class="d-block">
-        <h3>Add Todo</h3>
-        <input
-          class="form-control"
-          id="title"
-          placeholder="ex: clean car"
-          v-model="title"
-        />
-        <h3>Description</h3>
-        <input
-          class="form-control"
-          id="description"
-          placeholder=""
-          v-model="description"
-        />
-      </div>
-      <div class="d-flex justify-content-between" style="margin-top: 1em">
-        <b-button @click="$bvModal.hide('modal-1')">Cancel</b-button>
-        <b-button variant="primary" @click="saveTodo()">Save</b-button>
-      </div>
-    </b-modal> -->
+  <section class="ma-2">
+    <v-card
+      v-for="todo in todos"
+      :key="todo._id"
+      max-width="500"
+      class="d-flex flex-row justify-space-between align-center pa-5"
+      @click="goToDetail(todo)"
+    >
+      <div>{{ todo.title }}</div>
+      <v-icon>mdi-arrow-right</v-icon>
+    </v-card>
+    <AddTodoModal class="ma-2" />
   </section>
 </template>
 
-<script>
-import { todosApi } from "@/apiCalls/todos.js";
-// import Modal from "../components/AddTodoModal.vue";
+<script lang="ts">
+import Vue from 'vue'
+import { mapState, mapActions } from 'vuex'
+import { AppState, Todo } from '@/types'
+import AddTodoModal from '../components/AddTodoModal.vue'
 
-export default {
-  // components: {
-  //   Modal,
-  // },
-  data() {
-    return {
-      todos: [],
-      showAddModal: false,
-      title: "",
-      description: "",
-    };
+export default Vue.extend({
+  components: {
+    AddTodoModal
   },
+  computed: mapState({
+    todos: state => (state as AppState).todo.todos
+  }),
   methods: {
-    showModal() {
-      this.showAddModal = true;
-    },
-    closeModal() {
-      this.showAddModal = false;
-    },
-    async saveTodo() {
-      console.log(this.title);
-      console.log(this.description);
-      await todosApi.createTodo({
-        title: this.title,
-        description: this.description,
-      });
-      this.todos = await todosApi.getTodos();
-      this.$bvModal.hide("modal-1");
-    },
+    ...mapActions('todo', ['getTodos']),
+    goToDetail(todo: Todo) {
+      this.$router.push({
+        name: 'TodoItem',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        params: { title: todo.title, description: todo.description, _id: todo._id! }
+      })
+    }
   },
   async mounted() {
-    this.todos = await todosApi.getTodos();
-    console.log(this.todos);
-  },
-};
+    this.getTodos()
+  }
+})
 </script>
