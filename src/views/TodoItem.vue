@@ -8,7 +8,7 @@
         <v-text-field outlined v-model="newDescription"></v-text-field>
       </div>
       <div class="d-flex row justify-space-between">
-        <v-btn depressed @click="deleteTodo()" color="error">Delete</v-btn>
+        <v-btn depressed @click="handleDeleteTodo" color="error">Delete</v-btn>
         <div>
           <v-btn depressed @click="goToList">Cancel</v-btn>
           <v-btn depressed @click="handleUpdateTodo" color="success" class="ml-2">Save</v-btn>
@@ -36,7 +36,7 @@ export default Vue.extend({
   },
   methods: {
     ...mapActions('todo', ['deleteTodo', 'updateTodo']),
-    async deleteTodo() {
+    async handleDeleteTodo() {
       await this.deleteTodo(this._id)
       this.$router.replace('/')
     },
