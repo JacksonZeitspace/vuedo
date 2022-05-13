@@ -15,30 +15,47 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapState, mapActions } from 'vuex'
-import { AppState, Todo } from '@/types'
+import { defineComponent, onMounted } from '@vue/composition-api'
+import { createNamespacedHelpers } from 'vuex-composition-helpers'
+// import { useRouter } from 'vue-router'
+import { Todo } from '@/types'
 import AddTodoModal from '../components/AddTodoModal.vue'
 
-export default Vue.extend({
+const { useActions: useTodoActions, useState: useTodoState } = createNamespacedHelpers('todo')
+
+export default defineComponent({
   components: {
     AddTodoModal
   },
-  computed: mapState({
-    todos: state => (state as AppState).todo.todos
-  }),
-  methods: {
-    ...mapActions('todo', ['getTodos']),
-    goToDetail(todo: Todo) {
-      this.$router.push({
+  setup(props, context) {
+    const { todos } = useTodoState(['todos'])
+    const { getTodos } = useTodoActions(['getTodos'])
+
+    // const router = useRouter()
+
+    onMounted(async () => {
+      await getTodos()
+    })
+
+    function goToDetail(todo: Todo) {
+      // note: root is not available in vue3 and the router will be accessed with useRouter from the new vue-router see commented out code above and below for usage
+      // If you are using nuxt, you can use the @nuxt/composition api package and import useRouter from there as well
+      context.root.$router.push({
         name: 'TodoItem',
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         params: { title: todo.title, description: todo.description, _id: todo._id! }
       })
+      // router.push({
+      //   name: 'TodoItem',
+      //   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      //   params: { title: todo.title, description: todo.description, _id: todo._id! }
+      // })
     }
-  },
-  async mounted() {
-    this.getTodos()
+
+    return {
+      goToDetail,
+      todos
+    }
   }
 })
 </script>

@@ -22,23 +22,31 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapActions } from 'vuex'
+import { defineComponent, ref } from '@vue/composition-api'
+import { createNamespacedHelpers } from 'vuex-composition-helpers'
 
-export default Vue.extend({
+const { useActions: useTodoActions } = createNamespacedHelpers('todo')
+
+export default defineComponent({
   name: 'AddTodoModal',
-  data() {
-    return {
-      addTodoModal: false,
-      title: '',
-      description: ''
+  setup() {
+    const addTodoModal = ref(false)
+    const title = ref('')
+    const description = ref('')
+
+    const { createTodo } = useTodoActions(['createTodo'])
+
+    async function saveTodo(): Promise<void> {
+      await createTodo({ title: title.value, description: description.value })
+      addTodoModal.value = false
     }
-  },
-  methods: {
-    ...mapActions('todo', ['createTodo']),
-    async saveTodo(): Promise<void> {
-      await this.createTodo({ title: this.title, description: this.description })
-      this.addTodoModal = false
+
+    return {
+      addTodoModal,
+      title,
+      description,
+      // methods
+      saveTodo
     }
   }
 })

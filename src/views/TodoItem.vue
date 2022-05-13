@@ -3,9 +3,9 @@
     <v-card elevation="0" max-width="500" class="ma-4">
       <div class="mt-2">
         <h3>Title</h3>
-        <v-text-field outlined v-model="newTitle"></v-text-field>
+        <v-text-field outlined v-model="form.title"></v-text-field>
         <h3>Description</h3>
-        <v-text-field outlined v-model="newDescription"></v-text-field>
+        <v-text-field outlined v-model="form.description"></v-text-field>
       </div>
       <div class="d-flex row justify-space-between">
         <v-btn depressed @click="handleDeleteTodo" color="error">Delete</v-btn>
@@ -18,34 +18,46 @@
   </section>
 </template>
 
-<script>
-import Vue from 'vue'
-import { mapActions } from 'vuex'
+<script lang="ts">
+import { defineComponent, reactive } from '@vue/composition-api'
+import { createNamespacedHelpers } from 'vuex-composition-helpers'
 
-export default Vue.extend({
+const { useActions: useTodoActions } = createNamespacedHelpers('todo')
+
+export default defineComponent({
   props: {
     title: String,
     description: String,
     _id: String
   },
-  data() {
-    return {
-      newTitle: this.title,
-      newDescription: this.description
+  setup(props, context) {
+    const form = reactive({
+      title: props.title,
+      description: props.description
+    })
+
+    const { deleteTodo, updateTodo } = useTodoActions(['deleteTodo', 'updateTodo'])
+
+    async function handleDeleteTodo() {
+      await deleteTodo(props._id)
+      context.root.$router.back()
     }
-  },
-  methods: {
-    ...mapActions('todo', ['deleteTodo', 'updateTodo']),
-    async handleDeleteTodo() {
-      await this.deleteTodo(this._id)
-      this.$router.replace('/')
-    },
-    async handleUpdateTodo() {
-      await this.updateTodo({ title: this.newTitle, description: this.newDescription, _id: this._id })
-      this.$router.replace('/')
-    },
-    goToList() {
-      this.$router.back()
+
+    async function handleUpdateTodo() {
+      await updateTodo({ title: form.title, description: form.description, _id: props._id })
+      context.root.$router.back()
+    }
+
+    function goToList() {
+      context.root.$router.back()
+    }
+
+    return {
+      form,
+      // methods
+      goToList,
+      handleDeleteTodo,
+      handleUpdateTodo
     }
   }
 })
