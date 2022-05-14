@@ -21,5 +21,9 @@ export const todosApi = {
   updateTodo: async (payload: Todo): Promise<Todo> => {
     const res = await api.put(`/todos/${payload._id}`, payload)
     return res.data
+  },
+  toggleDone: async (_id: string, done: boolean): Promise<Todo> => {
+    const res = await api.put(`/todos/${_id}/done`, { done })
+    return res.data
   }
 }
