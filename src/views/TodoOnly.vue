@@ -13,11 +13,7 @@
       <v-icon @click="goToDetail(todo)">mdi-arrow-right</v-icon>
     </v-card>
     <div class="d-flex flex-row justify-space-between align-center" style="width: 500px">
-      <AddTodoModal class="ma-2" />
-      <div>
-        <v-btn @click="goToDone" color="primary" class="mr-2">Done List</v-btn>
-        <v-btn @click="goToNotDone" color="primary" class="mr-2">Todo List</v-btn>
-      </div>
+      <v-btn @click="goBack" color="primary" class="ma-2">Back</v-btn>
     </div>
   </section>
 </template>
@@ -26,17 +22,13 @@
 import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
 import { AppState, Todo } from '@/types'
-import AddTodoModal from '../components/AddTodoModal.vue'
 
 export default Vue.extend({
-  components: {
-    AddTodoModal
-  },
   computed: mapState({
-    todos: state => (state as AppState).todo.todos
+    todos: state => (state as AppState).todo.todos.filter(todo => !todo.done)
   }),
   methods: {
-    ...mapActions('todo', ['getTodos', 'toggleDone']),
+    ...mapActions('todo', ['toggleDone']),
     goToDetail(todo: Todo) {
       this.$router.push({
         name: 'TodoItem',
@@ -44,22 +36,12 @@ export default Vue.extend({
         params: { title: todo.title, description: todo.description, _id: todo._id! }
       })
     },
-    goToDone() {
-      this.$router.push({
-        name: 'TodoDone'
-      })
-    },
-    goToNotDone() {
-      this.$router.push({
-        name: 'TodoOnly'
-      })
+    goBack() {
+      this.$router.back()
     },
     async handleToggleDone(todo: Todo) {
       await this.toggleDone({ _id: todo._id, done: todo.done })
     }
-  },
-  async mounted() {
-    this.getTodos()
   }
 })
 </script>
