@@ -58,6 +58,20 @@ export const TodoStore = {
       } catch (e) {
         return e as Error
       }
+    },
+    async toggleDone(
+      { dispatch }: { dispatch: Dispatch },
+      { _id, done }: {
+        _id: string,
+        done: boolean,
+      }
+    ): Promise<void | Error> {
+      try {
+        await todosApi.toggleDone(_id, done)
+        await dispatch('getTodos')
+      } catch (e) {
+        return e as Error
+      }
     }
   },
   getters: {},
