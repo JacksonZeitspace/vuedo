@@ -1,7 +1,7 @@
 <template>
   <section class="ma-2">
     <v-card
-      v-for="todo in todos"
+      v-for="todo in notDoneTodos"
       :key="todo._id"
       max-width="500"
       class="d-flex flex-row justify-space-between align-center px-5"
@@ -19,28 +19,40 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import { mapState, mapActions } from 'vuex'
-import { AppState, Todo } from '@/types'
+import { computed, defineComponent } from '@vue/composition-api'
+import { createNamespacedHelpers } from 'vuex-composition-helpers'
+import { Todo } from '@/types'
 
-export default Vue.extend({
-  computed: mapState({
-    todos: state => (state as AppState).todo.todos.filter(todo => !todo.done)
-  }),
-  methods: {
-    ...mapActions('todo', ['toggleDone']),
-    goToDetail(todo: Todo) {
-      this.$router.push({
+const { useActions: useTodoActions, useState: useTodoState } = createNamespacedHelpers('todo')
+
+export default defineComponent({
+  setup(props, context) {
+    const { todos } = useTodoState(['todos'])
+    const { toggleDone } = useTodoActions(['toggleDone'])
+
+    const notDoneTodos = computed(() => todos.value.filter((todo: Todo) => !todo.done))
+
+    function goToDetail(todo: Todo) {
+      context.root.$router.push({
         name: 'TodoItem',
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         params: { title: todo.title, description: todo.description, _id: todo._id! }
       })
-    },
-    goBack() {
-      this.$router.back()
-    },
-    async handleToggleDone(todo: Todo) {
-      await this.toggleDone({ _id: todo._id, done: todo.done })
+    }
+
+    function goBack() {
+      context.root.$router.back()
+    }
+
+    async function handleToggleDone(todo: Todo) {
+      await toggleDone({ _id: todo._id, done: todo.done })
+    }
+
+    return {
+      notDoneTodos,
+      goToDetail,
+      goBack,
+      handleToggleDone
     }
   }
 })
