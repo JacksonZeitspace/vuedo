@@ -38,17 +38,17 @@ export default defineComponent({
 
     const { deleteTodo, updateTodo } = useTodoActions(['deleteTodo', 'updateTodo'])
 
-    async function handleDeleteTodo() {
+    const handleDeleteTodo = async (): Promise<void> => {
       await deleteTodo(props._id)
       context.root.$router.back()
     }
 
-    async function handleUpdateTodo() {
+    const handleUpdateTodo = async (): Promise<void> => {
       await updateTodo({ title: form.title, description: form.description, _id: props._id })
       context.root.$router.back()
     }
 
-    function goToList() {
+    const goToList = (): void => {
       context.root.$router.back()
     }
 

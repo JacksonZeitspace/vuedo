@@ -36,7 +36,7 @@ export default defineComponent({
 
     const { createTodo } = useTodoActions(['createTodo'])
 
-    async function saveTodo(): Promise<void> {
+    const saveTodo = async (): Promise<void> => {
       await createTodo({ title: title.value, description: description.value })
       addTodoModal.value = false
     }

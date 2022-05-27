@@ -32,7 +32,7 @@ export default defineComponent({
 
     const doneTodos = computed(() => todos.value.filter((todo: Todo) => todo.done))
 
-    function goToDetail(todo: Todo) {
+    const goToDetail = (todo: Todo): void => {
       context.root.$router.push({
         name: 'TodoItem',
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -40,13 +40,9 @@ export default defineComponent({
       })
     }
 
-    function goBack() {
-      context.root.$router.back()
-    }
+    const goBack = (): void => context.root.$router.back()
 
-    async function handleToggleDone(todo: Todo) {
-      await toggleDone({ _id: todo._id, done: todo.done })
-    }
+    const handleToggleDone = async (todo: Todo): Promise<void> => await toggleDone({ _id: todo._id, done: todo.done })
 
     return {
       doneTodos,

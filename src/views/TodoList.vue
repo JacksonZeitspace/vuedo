@@ -41,11 +41,11 @@ export default defineComponent({
 
     // const router = useRouter()
 
-    onMounted(async () => {
+    onMounted(async (): Promise<void> => {
       await getTodos()
     })
 
-    function goToDetail(todo: Todo) {
+    const goToDetail = (todo: Todo): void => {
       // note: root is not available in vue3 and the router will be accessed with useRouter from the new vue-router see commented out code above and below for usage
       // If you are using nuxt, you can use the @nuxt/composition api package and import useRouter from there as well
       context.root.$router.push({
@@ -60,21 +60,19 @@ export default defineComponent({
       // })
     }
 
-    function goToDone() {
+    const goToDone = (): void => {
       context.root.$router.push({
         name: 'TodoDone'
       })
     }
 
-    function goToNotDone() {
+    const goToNotDone = (): void => {
       context.root.$router.push({
         name: 'TodoOnly'
       })
     }
 
-    async function handleToggleDone(todo: Todo) {
-      await toggleDone({ _id: todo._id, done: todo.done })
-    }
+    const handleToggleDone = async (todo: Todo): Promise<void> => await toggleDone({ _id: todo._id, done: todo.done })
 
     return {
       todos,
